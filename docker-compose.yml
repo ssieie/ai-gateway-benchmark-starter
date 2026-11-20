@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  vllm-server:
+    image: vllm/vllm-openai:latest
+    command: >
+      --model Qwen/Qwen2.5-7B-Instruct-AWQ
+      --quantization awq
+      --dtype float16
+      --max-model-len 8192
+      --gpu-memory-utilization 0.90
+      --max-num-seqs 32
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # 预留网关服务位 (后续替换为实际的 API Gateway 服务)
+  api-gateway:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    depends_on:
+      - vllm-server
