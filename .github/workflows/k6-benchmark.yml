@@ -1,0 +1,16 @@
+name: Gateway Load Test CI
+on: [push, pull_request]
+
+jobs:
+  k6_load_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Run k6 Load Test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: benchmark/k6_gateway_load.js
+        env:
+          K6_THRESHOLDS: '{"http_req_duration": ["p(99)<500"]}'
